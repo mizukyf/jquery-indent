@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ja" lang="ja">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<meta http-equiv="Content-Script-Type" content="text/javascript" />
+	
+	<title>jQuery.indent.js デモ</title>
+	
+	<script type="text/javascript" src="lib/jquery-1.3.2.min.js"></script>
+	<script type="text/javascript" src="../jquery-indent-1.2.js"></script>
+	<script type="text/javascript">
+
+(function($){$(function(){
+	
+	// Sample 1
+	$('#source > textarea').val($('#sample').html());
+	$('#indented > textarea').val($('#sample').indent());
+	
+	// Sample 2
+	var textareas = $('#sample2 > textarea'),
+		buttons = $('#sample2 > button');
+	
+	buttons.eq(0).click(function(){
+		textareas.eq(1).val($.indent(textareas.eq(0).val()));
+	});
+	buttons.eq(1).click(function(){
+		textareas.eq(1).val($.indent(textareas.eq(0).val(), {xhtml: false}));
+	});
+	
+});})(jQuery);
+	
+	</script>
+	<style type="text/css">
+		
+		body{
+			width: 800px;
+			margin: 0 auto;
+			padding: 2em;
+			font-size: 14px;
+			font-family: Arial, Helvetica, Meiryo, sans-serif;
+			line-height: 1.5;
+			color: #333;
+		}
+		table, th, td{
+			border-collapse: collapse;
+			border: 1px solid #333;
+		}
+		th, td{
+			padding: 1ex;
+		}
+		textarea{
+			font-size: inherit;
+		}
+		div{
+			margin: 1em 0;
+		}
+		#sample{
+			border: 1px solid #333;
+			padding: 1em;
+		}
+		em{
+			font-weight: bold;
+		}
+		code{
+			font-family: "Courier New", Courier, monospace;
+			font-weight: bold;
+			color: #666;
+		}
+		
+	</style>
+</head>
+<body>
+
+<h1>jquery-indent-1.2.js デモ</h1>
+<p>
+	jquery-indent.jsは、渡されたHTMLソースコードを、適切にインデントして、見やすいかたちに整形するプラグインです。
+	動作確認は、いずれもWindows Vista Business SP1上の、Firefox 3.5、Opera 9.46、Safari 3、InternetExplorer 8で行っています（ただしInternetExplorerについてはIETesterを使用したエミュレーション環境で、バージョン6と7についても確認しています）。
+</p>
+<p>
+	jQueryのメソッドとして、元のソースコードを第1引数にして呼び出すと、インデントしたソースコードを返します。
+	jQuery要素集合のメソッドとして呼び出すと、各要素内のHTMLソースコード（element.innerHTML）をコピーし、インデントした上で返します。
+</p>
+<p>
+	<code>jQuery.indent({String} source code [, {Object} options ]) : {String} indented source code</code><br />
+	<code>jQuery({String} selector).indent([ {Object} options ]) : {String or Array} indented source code(s)</code>
+</p>
+<h2>1: オプション</h2>
+<p>オプションは、<code>{tab: "&nbsp;&nbsp;&nbsp;&nbsp;" /* スペース4つ */, xhtml: false}</code>というかたちで指定します。指定しなかった項目についてはデフォルト値が有効になります。</p>
+<table>
+	<thead>
+		<tr>
+			<th nowrap="nowrap">オプション名</th>
+			<th>型</th>
+			<th>説明</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>tab</td>
+			<td>String</td>
+			<td>インデントに使用する文字を指定します。デフォルトは<code>"\t"</code>（タブ文字）です</td>
+		</tr>
+		<tr>
+			<td>xhtml</td>
+			<td>Boolean</td>
+			<td>IMGやBRなど、もともと閉じタグがない要素について、タグ末尾を"... />"というXHTMLのかたちに整えます。デフォルトはtrueで、整形されます。</td>
+		</tr>
+		<tr>
+			<td>singles</td>
+			<td>Array</td>
+			<td>これは上述の末尾修正の対象とする要素を指定するものです。デフォルトは<code>["img", "br", "hr"]</code>です。<br />
+			※タグによってはこの末尾整形をすることによって、正しく表示・動作しない場合があります。懸念されるのはscriptやlinkタグです。</td>
+		</tr>
+		<tr>
+			<td>conserve</td>
+			<td>Array</td>
+			<td>インデント整形の対象外とするタグ名を指定します。デフォルトは<code>["script"]</code>です。</td>
+		</tr>
+		<tr>
+			<td>selector</td>
+			<td>String</td>
+			<td>インデント整形の対象範囲を指定するものです。
+			このセレクタの書式はjQueryと共通。デフォルトは<code>""</code>（空文字列）で、渡された文字列の全体がインデント整形処理の対象になります。
+			このセレクタにマッチする要素が複数ある場合は、最初の要素のみが処理の対象になります。したがってid属性や要素インデクスの指定（<code>"tagname:eq(index)"</code>）などを使用して、セレクタが一意の要素を指すようにすることが重要です。<br />
+			※なお、<code>jQuery({String} selector).indent()</code>の書式で呼び出す場合の「selector」とは意味が異なります。この場合の「selector」が指す要素は、インデント処理の対象にはなりません。要素の内側のHTMLソースコードが対象になります。これに対して、オプションとしての「selector」が指す要素は、インデント処理の対象になります。この要素がいわばルート要素＝インデント幅0（ゼロ）となります。</td>
+		</tr>
+	</tbody>
+</table>
+<h2>2: サンプル</h2>
+<div id="sample">
+	<h3>世界人権宣言前文</h3>
+<blockquote id="UDHR-preamble">
+		<p>人類社会の<em>すべての構成員の固有の尊厳と平等で譲ることのできない権利とを承認することは、世界における自由、正義及び平和の基礎である</em>ので、</p><p>人権の無視及び軽侮が、人類の良心を踏みにじった野蛮行為をもたらし、言論及び信仰の自由が受けられ、恐怖及び欠乏のない世界の到来が、一般の人々の最高の願望として宣言されたので、</p>
+		<p>		<em>人間が専制と圧迫とに対する最後の手段として反逆に訴えることがないようにするため</em>には、法の支配によって人権保護することが肝要であるので、</p>
+		<p>諸国間の友好関係の発展を促進することが、肝要であるので、</p>
+				<p>国際連合の諸国民は、国際連合憲章において、基本的人権、人間の尊厳及び価値並びに男女の同権についての信念を再確認し、かつ、<em>一層大きな自由のうちで社会的進歩と生活水準の向上とを促進することを決意した</em>ので、</p>
+
+		<p>加盟国は、国際連合と協力して、人権及び基本的自由の普遍的な尊重及び遵守の促進を達成することを誓約したので、</p>
+		<p>これらの権利及び自由に対する共通の理解は、この誓約を完全にするためにもっとも重要であるので、</p>
+		<p>よって、ここに、国際連合総会は、</p>
+	<p>社会の各個人及び各機関が、この世界人権宣言を常に念頭に置きながら、加盟国自身の人民の間にも、また、加盟国の管轄下にある地域の人民の間にも、これらの権利と自由との尊重を指導及び教育によって促進すること並びにそれらの普遍的かつ効果的な承認と尊守とを国内的及び国際的な漸進的措置によって確保することに努力するように、<em>すべての人民とすべての国とが達成すべき共通の基準として</em>、この世界人権宣言を公布する。 </p>
+	</blockquote>
+			<p style="text-align: right;"><cite>（<a href="http://www.mofa.go.jp/Mofaj/gaiko/udhr/1b_001.html">外務省　世界人権宣言（仮訳文）</a>より）</cite></p>
+</div>
+<div id="source">
+	<h3>サンプルのソースコード</h3>
+	<p><code>jQuery('#sample').html()</code></p>
+	<textarea cols="100" rows="25"></textarea>
+</div>
+<div id="indented">
+	<h3>処理後のソースコード</h3>
+	<p><code>jQuery('#sample').indent()</code></p>
+	<textarea cols="100" rows="25"></textarea>
+</div>
+<h2>3: 自前のサンプルでテスト</h2>
+<div id="sample2">
+	<h3>サンプルのソースコード</h3>
+	<textarea cols="100" rows="25"></textarea>
+	<button type="button">XHTMLとして整形</button>
+	<button type="button">HTMLとして整形</button>
+	<h3>処理後のソースコード</h3>
+	<textarea cols="100" rows="25"></textarea>
+</div>
+
+</body>
+</html>
